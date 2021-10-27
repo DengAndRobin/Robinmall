@@ -1,0 +1,11 @@
+server:
+  port: 9068
+spring:
+  application:
+    name: order-close
+eureka:
+  client:
+    service-url: http://robin:robin@localhost:8761/eureka
+hystrix:
+  metrics:
+    enabled: true

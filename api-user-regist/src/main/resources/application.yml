@@ -1,0 +1,13 @@
+server:
+  port: 8002
+spring:
+  application:
+    name: api-user-regist
+eureka:
+  client:
+    service-url:
+      defaultZone: http://robin:robin@localhost:8761/eureka
+
+hystrix:
+  metrics:
+    enabled: true

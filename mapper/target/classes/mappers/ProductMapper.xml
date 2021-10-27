@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.robin.dao.ProductMapper">
+  <resultMap id="BaseResultMap" type="com.robin.entity.Product">
+    <id column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="product_name" jdbcType="VARCHAR" property="productName" />
+    <result column="category_id" jdbcType="INTEGER" property="categoryId" />
+    <result column="root_category_id" jdbcType="INTEGER" property="rootCategoryId" />
+    <result column="sold_num" jdbcType="INTEGER" property="soldNum" />
+    <result column="product_status" jdbcType="INTEGER" property="productStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  </resultMap>
+
+  <resultMap id="ProductVOMap" type="com.robin.entity.ProductVO">
+    <id column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="product_name" jdbcType="VARCHAR" property="productName" />
+    <result column="category_id" jdbcType="INTEGER" property="categoryId" />
+    <result column="root_category_id" jdbcType="INTEGER" property="rootCategoryId" />
+    <result column="sold_num" jdbcType="INTEGER" property="soldNum" />
+    <result column="product_status" jdbcType="INTEGER" property="productStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    <collection property="productImgs" column="product_id" select="com.robin.dao.ProductImgMapper.selectProductImgByProductId"/>
+  </resultMap>
+
+  <resultMap id="ProductVOMap2" type="com.robin.entity.ProductVO">
+    <id column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="product_name" jdbcType="VARCHAR" property="productName" />
+    <result column="category_id" jdbcType="INTEGER" property="categoryId" />
+    <result column="root_category_id" jdbcType="INTEGER" property="rootCategoryId" />
+    <result column="sold_num" jdbcType="INTEGER" property="soldNum" />
+    <result column="product_status" jdbcType="INTEGER" property="productStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    <collection property="skus" column="product_id" select="com.robin.dao.ProductSkuMapper.selectMinPriceByProductId"/>
+  </resultMap>
+  <select id="selectRecommendProducts" resultMap="ProductVOMap">
+    select
+      product_id,
+      product_name,
+      category_id,
+      root_category_id,
+      sold_num,
+      product_status,
+      content,
+      create_time,
+      update_time
+    from product
+    order by create_time desc
+    limit 0,3
+  </select>
+
+  <select id="selectTop6ByCategoryId" resultMap="ProductVOMap">
+    select
+        product_id,
+        product_name,
+        category_id,
+        root_category_id,
+        sold_num,
+        product_status,
+        content,
+        create_time,
+        update_time
+    from product
+    where root_category_id = #{categoryId}
+    order by sold_num
+    limit 0,6
+  </select>
+
+  <select id="selectProductByCategoryId" resultMap="ProductVOMap2">
+    select
+      product_id,
+      product_name,
+      category_id,
+      root_category_id,
+      sold_num,
+      product_status,
+      content,
+      create_time,
+      update_time
+    from product
+    where category_id = #{categoryId}
+    limit #{start},#{limit}
+  </select>
+
+  <select id="selectBrandsByCategoryId" resultSets="java.util.List" resultType="String">
+    select
+        distinct brand
+    from product_params
+    where product_id in(
+        select product_id
+        from product
+        where category_id = #{categoryId}
+      )
+  </select>
+
+  <select id="selectProductByCategoryIdAndBrand" resultMap="ProductVOMap2">
+    select
+      p.product_id,
+      p.product_name,
+      p.category_id,
+      p.root_category_id,
+      p.sold_num,
+      p.product_status,
+      p.content,
+      p.create_time,
+      p.update_time
+    from product p
+    inner join product_params s
+    on p.product_id = s.product_id
+    where p.category_id = #{categoryId} and s.brand = #{brand}
+    limit #{start},#{limit}
+  </select>
+
+  <select id="selectProductCountByCategoryIdAndBrand" resultType="int">
+    select
+      count(p.product_id)
+    from product p
+    inner join product_params s
+    on p.product_id = s.product_id
+    where p.category_id = #{categoryId} and s.brand = #{brand}
+  </select>
+
+  <select id="selectProductByKeyWord" resultMap="ProductVOMap2">
+    select
+      product_id,
+      product_name,
+      category_id,
+      root_category_id,
+      sold_num,
+      product_status,
+      content,
+      create_time,
+      update_time
+    from product
+    where product_name like #{keyWord}
+    limit #{start},#{limit}
+  </select>
+
+  <select id="selectBrandsByKeyWord" resultSets="java.util.List" resultType="String">
+    select
+      distinct brand
+    from product_params
+    where product_id in(
+      select product_id
+      from product
+      where product_name like #{keyWord}
+    )
+  </select>
+</mapper>
