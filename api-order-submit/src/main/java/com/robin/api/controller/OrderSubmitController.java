@@ -3,6 +3,7 @@ package com.robin.api.controller;
 import com.github.wxpay.sdk.WXPay;
 import com.robin.api.config.MyPayConfig;
 import com.robin.api.service.OrderSubmitService;
+import com.robin.api.service.impl.SendMsgToMQ;
 import com.robin.beans.Orders;
 import com.robin.vo.ResStatus;
 import com.robin.vo.ResultVO;
@@ -23,6 +24,10 @@ public class OrderSubmitController {
 
     @Autowired
     private OrderSubmitService orderSubmitService;
+
+    @Autowired
+    private SendMsgToMQ sendMsgToMQ;
+
     @PostMapping("/order/add")
     @ApiOperation("保存订单和订单项接口")
     @ApiImplicitParam(dataType = "string",name = "cartIds",value = "购买的购物车id集合",required = true)
@@ -46,6 +51,7 @@ public class OrderSubmitController {
             WXPay wxPay = new WXPay(new MyPayConfig());
             Map<String, String> resp = wxPay.unifiedOrder(data);
             orderInfo.put("payUrl", resp.get("code_url"));
+            sendMsgToMQ.sendMsg(orderId);
             return new ResultVO(ResStatus.YES,"提交订单成功",orderInfo);
         }catch (SQLException e){
             return new ResultVO(ResStatus.NO,"提交订单失败！",null);

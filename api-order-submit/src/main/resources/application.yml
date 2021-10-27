@@ -6,8 +6,14 @@ spring:
   redis:
     port: 6379
     database: 0
-    host: 192.168.179.128
+    host: 192.168.179.129
     connect-timeout: 5000
+  rabbitmq:
+    host: 192.168.179.129
+    virtual-host: host1
+    port: 5672
+    username: robin
+    password: 123456
 eureka:
   client:
     service-url:
