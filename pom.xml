@@ -33,6 +33,9 @@
         <module>order-close</module>
         <module>api-order-timeout-cancle</module>
         <module>product-sku-query</module>
+        <module>orderitem-query</module>
+        <module>eureka-server</module>
+        <module>config-server</module>
     </modules>
     <packaging>pom</packaging>
 
